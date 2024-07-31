@@ -1,0 +1,54 @@
+body {
+    padding-top: 100px; /* Adjust based on the height of the navbar */
+}
+
+/* Carousel Styling */
+#hospitalCarousel {
+    position: relative;
+    overflow: hidden;
+    height: 400px; /* Set a fixed height for the carousel */
+}
+
+.carousel-item {
+    height: 100%;
+}
+
+.carousel-image {
+    object-fit: cover; /* Ensures images cover the entire area */
+    height: 100%;
+    width: 100%;
+}
+
+/* Optional: Centering carousel captions */
+.carousel-caption {
+    bottom: 20px;
+}
+
+.nav {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    text-align: right; /* Aligns text to the right */
+}
+
+.nav-item {
+    display: inline-block;
+    margin: 0;
+}
+
+.nav-link {
+    text-decoration: none;
+}
+/* CSS to justify text */
+.text-justify {
+    text-align: justify;
+}
+
+/* Optional: Ensure the text does not stretch too much */
+.text-justify::after {
+    content: '';
+    display: block;
+    height: 0;
+    width: 100%;
+}
+
