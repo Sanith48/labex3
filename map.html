@@ -3,13 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospital Management System</title>
+    <title>Karuna Hospital - Map</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .alert {
+            margin-top: 1em;
+            margin-bottom: 1em;
+            background-color: red;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -21,32 +36,67 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                    <a class="nav-link" href="index.html">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="map.html">Map</a>
+                    <a class="nav-link active" aria-current="page" href="map.html">Map</a>
                 </li>
-               
                 <li class="nav-item">
                     <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#infoModal">
                         Learn More
                     </button>
-                   
                 </li>
             </ul>
         </div>
     </nav>
+
+    <!-- Map and Geolocation Section -->
     <div class="container my-5">
-        <h1>Navigate to Location</h1>
+        <h1>Find Us on the Map</h1>
         <p>
-            Click the link below to view the location on Google Maps:
+            Click the button below to view your current location on the map:
+        </p>
+        <button id="clickme" class="btn btn-primary">Show My Location</button>
+        <div id="errorArea" class="alert d-none"></div>
+        <div id="map" class="d-none"></div>
+
+        <h2>Geolocation Details</h2>
+        <ul id="geoDetails" class="list-unstyled">
+            <li><strong>Timestamp:</strong> <span id="timestamp">N/A</span></li>
+            <li><strong>Latitude:</strong> <span id="latitude">N/A</span></li>
+            <li><strong>Longitude:</strong> <span id="longitude">N/A</span></li>
+            <li><strong>Accuracy:</strong> <span id="accuracy">N/A</span></li>
+            <li><strong>Altitude:</strong> <span id="altitude">N/A</span></li>
+            <li><strong>Altitude Accuracy:</strong> <span id="altiaccuracy">N/A</span></li>
+            <li><strong>Heading:</strong> <span id="heading">N/A</span></li>
+            <li><strong>Speed:</strong> <span id="speed">N/A</span></li>
+        </ul>
+
+        <p>
+            Or view the location on Google Maps:
         </p>
         <a href="https://maps.app.goo.gl/SdFWs7grzrAXQZQQ8" class="btn btn-primary" target="_blank">
             View on Google Maps
         </a>
     </div>
 
-
+    <!-- Modal -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoModalLabel">Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-justify">
+                    Empathy drives our mission at Karuna Hospital. We’re committed to delivering outstanding healthcare with compassion, respect, and love. Your well-being is our focus and we want to be a part of your treatment journey all along. We strive to provide state-of-the-art medical services with complete sensitivity and understanding for our patients. We foster enduring relationships and a thriving environment for healthcare providers and staff.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-light text-center py-3">
@@ -55,7 +105,42 @@
 
     <!-- Bootstrap JS Bundle (with Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <!-- Custom JS -->
-    <script src="js/scripts.js"></script>
+    <script>
+        document.getElementById("clickme").addEventListener('click', () => {
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    // Update the geolocation details
+                    document.getElementById("timestamp").innerText = new Date(pos.timestamp).toLocaleString();
+                    document.getElementById("latitude").innerText = pos.coords.latitude;
+                    document.getElementById("longitude").innerText = pos.coords.longitude;
+                    document.getElementById("accuracy").innerText = pos.coords.accuracy + ' meters';
+                    document.getElementById("altitude").innerText = (pos.coords.altitude ? pos.coords.altitude + ' meters' : 'N/A');
+                    document.getElementById("altiaccuracy").innerText = (pos.coords.altitudeAccuracy ? pos.coords.altitudeAccuracy + ' meters' : 'N/A');
+                    document.getElementById("heading").innerText = (pos.coords.heading ? pos.coords.heading + ' degrees' : 'N/A');
+                    document.getElementById("speed").innerText = (pos.coords.speed ? pos.coords.speed + ' meters/second' : 'N/A');
+
+                    // Display the map
+                    document.getElementById('map').classList.remove('d-none');
+                    var map = L.map('map').setView([pos.coords.latitude, pos.coords.longitude], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+
+                    L.marker([pos.coords.latitude, pos.coords.longitude]).addTo(map)
+                        .bindPopup('You are here')
+                        .openPopup();
+                }, error => {
+                    document.getElementById("errorArea").classList.remove('d-none');
+                    document.getElementById("errorArea").innerText = 'Error: ' + error.message;
+                });
+            } else {
+                document.getElementById("errorArea").classList.remove('d-none');
+                document.getElementById("errorArea").innerText = 'Geolocation is not supported by this browser.';
+            }
+        });
+    </script>
 </body>
 </html>
